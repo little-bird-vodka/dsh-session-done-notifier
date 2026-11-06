@@ -1,0 +1,6 @@
+{
+  "meta": {
+    "title": "Session Done Notifier",
+    "description": "Shows a bottom-right desktop popup with an optional Windows sound when a session finishes replying and waits for input, including while DSH is minimized or in the tray."
+  }
+}

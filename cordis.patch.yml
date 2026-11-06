@@ -1,0 +1,3 @@
+- insert:
+    - id: session-done-notifier
+      name: dsh-session-done-notifier
