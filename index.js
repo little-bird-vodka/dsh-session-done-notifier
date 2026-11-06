@@ -49,7 +49,7 @@ const DEFAULTS = Object.freeze({ enabled: true, sound: true })
 const dshHome = (process.env.DSH_HOME ?? '').trim() !== '' ? process.env.DSH_HOME.trim() : join(homedir(), '.dsh')
 const settingsPath = join(dshHome, SETTINGS_FILE)
 /** The popup helper writes the clicked Session here; the focused Client reads it. */
-const activationPath = join(tmpdir(), 'dsh-session-done-notifier-activate.json')
+const activationPath = join(tmpdir(), `dsh-session-done-notifier-activate-${process.pid}.json`)
 
 /**
  * `sessions` resolves a finishing Agent back to its Session header.
@@ -701,6 +701,7 @@ export function apply(ctx) {
         }
       }
       helpers.clear()
+      void fs.rm(activationPath, { force: true }).catch(() => undefined)
     }
   }, 'session-done-notifier: completion and question popups')
 }

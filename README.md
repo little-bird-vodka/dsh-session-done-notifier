@@ -94,7 +94,7 @@ The helper first records the source session, then restores the window:
 
 The click is absorbed for 250 ms before the popup closes, so a double-click cannot fall through to the window or taskbar underneath.
 
-The source session is written to `%TEMP%\dsh-session-done-notifier-activate.json`; the focused Client reads it once through the authenticated `/activate` route and calls `uiWorkspace.openSession(sessionId)`. No unauthenticated route accepts the click.
+The source session is written to `%TEMP%\dsh-session-done-notifier-activate-<pid>.json` (one file per Host process); the focused Client reads it once through the authenticated `/activate` route and calls `uiWorkspace.openSession(sessionId)`. No unauthenticated route accepts the click.
 
 ## Security and privacy
 
@@ -102,7 +102,7 @@ The source session is written to `%TEMP%\dsh-session-done-notifier-activate.json
 - The helper runs `powershell.exe -NoProfile -NonInteractive -ExecutionPolicy Bypass -File lib/popup.ps1` with `windowsHide`, and is stopped when the plugin unloads.
 - Routes require the Host's browser authentication and the plugin's static header. The activation file is a local `%TEMP%` file read only by the Host, containing a session id and timestamp.
 - Popups show session titles and the last assistant text on screen; be aware when sharing or recording the screen.
-- Settings and the activation file live outside the plugin package: `$DSH_HOME/session-done-notifier.json`, `%TEMP%\dsh-session-done-notifier-activate.json`, plus a bounded diagnostic log at `%TEMP%\dsh-session-done-notifier.log` (64 KiB cap).
+- Settings and the activation file live outside the plugin package: `$DSH_HOME/session-done-notifier.json`, `%TEMP%\dsh-session-done-notifier-activate-<pid>.json`, plus a bounded diagnostic log at `%TEMP%\dsh-session-done-notifier.log` (64 KiB cap).
 
 ## Compatibility and known limits
 
