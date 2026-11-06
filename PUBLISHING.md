@@ -1,8 +1,29 @@
 # Publishing
 
-This package is prepared for npm and two community indexes. Nothing here publishes automatically; run the steps in order.
+This package can be listed without npm: it lives at the repository root, has no
+build step, and declares `dsh.bundle.patch`, so a pinned Git commit is an
+installable source. Both community indexes accept that form.
 
-## Prerequisites
+## Git-only listing (no npm account)
+
+- Repository: `https://github.com/little-bird-vodka/dsh-session-done-notifier`
+- Version: `0.2.0`
+- Commit: `76852daa700cee547e0b4e6e34b9d3747751e107`
+- Package root: repository root (no `path:`)
+- Install: `dsh plugin --profile desktop add github:little-bird-vodka/dsh-session-done-notifier`
+
+**dshopen**: use the [plugin request](https://github.com/polang233/dsh-plugin-index/issues/new?template=plugin-add.yml)
+with the repo URL, version, full 40-character SHA, MIT license, tested DSH
+version, and a Windows-only note. A pinned Git listing is upgraded only after a
+maintainer checks the new commit, so reply in the issue for later releases.
+
+**dsh.works**: add one entry to `data/plugins.json` in
+[dshworks/awesome-dsh-plugins](https://github.com/dshworks/awesome-dsh-plugins)
+with `repo`, no `npm`, `verifiedAgainst: "0.2.2-rc.1"`, `lastVerified:
+"2026-11-06"`, and an honest `status`. The site generates
+`dsh plugin --profile web add github:<repo>` for a Git-only entry.
+
+## Prerequisites for npm
 
 - A public GitHub repository for this package (suggested: `little-bird-vodka/dsh-session-done-notifier`).
 - An npm account with 2FA; `npm login` on the machine that publishes.

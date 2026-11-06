@@ -21,7 +21,19 @@ Windows-only. DSH Desktop `0.2.2-rc.1` is the tested version (`engines.dsh` allo
 
 ## Install
 
-From npm (normal channel):
+From GitHub (works without npm):
+
+```sh
+dsh plugin --profile desktop add github:little-bird-vodka/dsh-session-done-notifier
+```
+
+Pin a release commit when you want a reproducible install:
+
+```sh
+dsh plugin --profile desktop add git+https://github.com/little-bird-vodka/dsh-session-done-notifier.git#76852daa700cee547e0b4e6e34b9d3747751e107
+```
+
+From npm, when published:
 
 ```sh
 dsh plugin --profile desktop add dsh-session-done-notifier
