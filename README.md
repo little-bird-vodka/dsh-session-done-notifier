@@ -148,7 +148,9 @@ Install a local checkout with `plugin_manager install_bundle` and restart DSH af
 ## Verification
 
 - Turn completion, question, approval, session-targeted click, tray/minimized/covered/visible click restore, and both toggles were verified on DSH `0.2.1-rc.2`.
-- The 0.2.2-rc.1 update is verified for install/load and the core paths during the standalone migration; see the release notes for the exact checks.
+- On `0.2.2-rc.1`: install applied with no warnings, the Client slot stayed active, an unauthenticated `GET /settings` returned 401, authenticated Client `GET`/`POST` requests succeeded (`cookie=yes`), a question popup appeared, and a completion popup clicked from another session returned to the source session through the `%TEMP%` activation file and the authenticated `/activate` route.
+- Both composer toggles were flipped on `0.2.2-rc.1` and the settings file reflected each change (bell/speaker).
+- Pending checks: a real approval popup on `0.2.2-rc.1` (the approval path was verified on `0.2.1-rc.2`), and a live failed-turn popup.
 - The `error`/`aborted` copy and icons were exercised against real `turn/end` reasons from local session logs, but a live failed-turn popup is still an occasional check rather than a scripted test.
 
 ## License
