@@ -157,8 +157,14 @@ npm pack --dry-run
 
 Install a local checkout with `plugin_manager install_bundle` and restart DSH after Host changes. Settings survive a reinstall; removing the bundle leaves the settings file in place.
 
-## Verification
+## Listings
 
+- **Open Plugin Market (dshopen)**: submitted in [issue #290](https://github.com/polang233/dsh-plugin-index/issues/290); pending review.
+- **dsh.works**: submitted in [PR #222](https://github.com/dshworks/awesome-dsh-plugins/pull/222); pending review.
+
+Both entries install from the pinned Git commit while no npm release exists.
+
+## Verification
 - Turn completion, question, approval, session-targeted click, tray/minimized/covered/visible click restore, and both toggles were verified on DSH `0.2.1-rc.2`.
 - On `0.2.2-rc.1`: install applied with no warnings, the Client slot stayed active, an unauthenticated `GET /settings` returned 401, authenticated Client `GET`/`POST` requests succeeded (`cookie=yes`), a question popup appeared, and a completion popup clicked from another session returned to the source session through the `%TEMP%` activation file and the authenticated `/activate` route.
 - Both composer toggles were flipped on `0.2.2-rc.1` and the settings file reflected each change (bell/speaker).
