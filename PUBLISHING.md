@@ -7,8 +7,8 @@ installable source. Both community indexes accept that form.
 ## Git-only listing (no npm account)
 
 - Repository: `https://github.com/little-bird-vodka/dsh-session-done-notifier`
-- Version: `0.2.2`
-- Commit: `962bb37e5dc07b6c36eb1cc1234581f751e665e3` (tag `session-done-notifier@0.2.2`)
+- Version: `0.2.3`
+- Commit: `4bb44bb7fbbe6abf20265aa88989300aac70dcc8` (tag `session-done-notifier@0.2.3`)
 - Package root: repository root (no `path:`)
 - Install: `dsh plugin --profile desktop add github:little-bird-vodka/dsh-session-done-notifier`
 
@@ -45,7 +45,7 @@ The published tarball must include `index.js`, `client.js`, `lib/popup.ps1`, `co
 Use a **separate profile**, not the profile you develop in:
 
 ```sh
-dsh plugin --profile sdn-test add dsh-session-done-notifier@0.2.2
+dsh plugin --profile sdn-test add dsh-session-done-notifier@0.2.3
 dsh --profile sdn-test --dump-config
 ```
 
@@ -100,7 +100,7 @@ Minimal entry:
     "icon": "icons/session-done-notifier.svg",
     "repository": { "url": "https://github.com/little-bird-vodka/dsh-session-done-notifier" },
     "versions": [{
-      "version": "0.2.2",
+      "version": "0.2.3",
       "publishTimestamp": 1795593600,
       "source": { "type": "npm" },
       "engines": { "dsh": ">=0.2.3-alpha.2 <0.3.0" }

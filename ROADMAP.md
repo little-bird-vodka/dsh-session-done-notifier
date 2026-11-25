@@ -5,7 +5,7 @@
 - 0.2.3 makes the two composer toggles independent: popups off with sound on plays the chime alone, and both off stays silent.
 - 0.2.2 replaces the route admission that DSH `0.2.3-alpha.2` removed (`connection.requestRejection`) with the admitted Peer, so the composer toggles, click-to-return and approval reports work again.
 - 0.2.1 fixed the Client-half inject but still used the removed route check; treat it as superseded.
-- Public at `https://github.com/little-bird-vodka/dsh-session-done-notifier`, tag `session-done-notifier@0.2.2` (commit `962bb37`).
+- Public at `https://github.com/little-bird-vodka/dsh-session-done-notifier`, tag `session-done-notifier@0.2.3` (commit `4bb44bb`).
 - Install is Git-only for now: `dsh plugin --profile desktop add github:little-bird-vodka/dsh-session-done-notifier`.
 - Both community indexes still hold 0.2.0 at commit `76852da`, verified against `0.2.2-rc.1`; both need an update request for 0.2.2:
   - Open Plugin Market: https://github.com/polang233/dsh-plugin-index/issues/290 (closed as completed on 2026-11-07)
@@ -23,6 +23,6 @@
 
 ## Next
 
-- Update both listings to `0.2.2` / `0.2.3-alpha.2` once the tag is public.
-- Verify a popup click switching back to another source session (the navigation itself), a live approval popup, and a failed-turn (`turn/end: error`) popup on 0.2.2.
+- Update both listings to `0.2.3` / `0.2.3-alpha.2` once the tag is public.
+- Verify a popup click switching back to another source session (the navigation itself), a live approval popup, and a failed-turn (`turn/end: error`) popup on 0.2.3.
 - Optional: publish to npm as `dsh-session-done-notifier`, then switch the markets from the pinned Git commit to the npm release (dshopen follows npm `latest`).
