@@ -30,7 +30,7 @@ dsh plugin --profile desktop add github:little-bird-vodka/dsh-session-done-notif
 Pin a release commit when you want a reproducible install:
 
 ```sh
-dsh plugin --profile desktop add git+https://github.com/little-bird-vodka/dsh-session-done-notifier.git#5f50a566c71c4f37e709d0cff7e67c226d341305
+dsh plugin --profile desktop add git+https://github.com/little-bird-vodka/dsh-session-done-notifier.git#962bb37e5dc07b6c36eb1cc1234581f751e665e3
 ```
 
 From npm, when published:
@@ -161,10 +161,10 @@ Install a local checkout with `plugin_manager install_bundle` and restart DSH af
 
 ## Listings
 
-- **Open Plugin Market (dshopen)**: listed from commit `76852da` with 0.2.0 ([issue #290](https://github.com/polang233/dsh-plugin-index/issues/290), closed as completed); the 0.2.1 update is pending.
-- **dsh.works**: listed with 0.2.0 ([PR #223](https://github.com/dshworks/awesome-dsh-plugins/pull/223), following the closed #222); the 0.2.1 update is pending.
+- **Open Plugin Market (dshopen)**: listed from commit `76852da` with 0.2.0 ([issue #290](https://github.com/polang233/dsh-plugin-index/issues/290), closed as completed); the 0.2.2 update is pending.
+- **dsh.works**: listed with 0.2.0 ([PR #223](https://github.com/dshworks/awesome-dsh-plugins/pull/223), following the closed #222); the 0.2.2 update is pending.
 
-Both entries install from the pinned Git commit while no npm release exists. The 0.2.0 listing is affected by the Client-half bug fixed in 0.2.1.
+Both entries install from the pinned Git commit while no npm release exists. The 0.2.0 listing is affected by the Client-half and route bugs fixed in 0.2.2.
 
 ## Verification
 - Turn completion, question, approval, session-targeted click, tray/minimized/covered/visible click restore, and both toggles were verified on DSH `0.2.1-rc.2`.
