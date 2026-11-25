@@ -1,6 +1,6 @@
 {
   "name": "dsh-session-done-notifier",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "description": "Bottom-right desktop popups with an optional Windows chime when a DSH session finishes, asks a question, or waits for approval, including while the window is minimized or in the tray.",
   "license": "MIT",
   "author": "little-bird-vodka",

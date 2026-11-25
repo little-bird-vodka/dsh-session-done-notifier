@@ -22,6 +22,10 @@
 .PARAMETER Sound
   Play the Windows notification sound when the popup appears.
 
+.PARAMETER SoundOnly
+  Play the notification sound and exit without creating the popup window.
+  Used when the popup toggle is off but the sound toggle is on.
+
 .PARAMETER Seconds
   How long the popup stays visible; hovering pauses this timer.
 
@@ -34,9 +38,10 @@
 #>
 [CmdletBinding()]
 param(
-  [Parameter(Mandatory = $true)][string]$Title,
-  [Parameter(Mandatory = $true)][string]$Body,
+  [string]$Title = '',
+  [string]$Body = '',
   [switch]$Sound,
+  [switch]$SoundOnly,
   [int]$Seconds = 8,
   [int]$Offset = 0,
   [string]$AppProcess = 'DeepSeek Harness',
@@ -61,7 +66,11 @@ function Write-NotifierLog([string]$Message) {
   }
 }
 
-Write-NotifierLog "popup start kind=$Kind sound=$($Sound.IsPresent) offset=$Offset"
+if ($SoundOnly) {
+  Write-NotifierLog 'sound-only start'
+} else {
+  Write-NotifierLog "popup start kind=$Kind sound=$($Sound.IsPresent) offset=$Offset"
+}
 
 # The stock chime peaks around a third of full scale, which is easy to miss at
 # a low master volume. Normalize a copy to ~92% once, then reuse it. The source
@@ -130,10 +139,6 @@ function Get-NotifierChime {
     return $source
   }
 }
-
-Add-Type -AssemblyName PresentationFramework
-Add-Type -AssemblyName PresentationCore
-Add-Type -AssemblyName WindowsBase
 
 if (-not ('DshPopupNative' -as [type])) {
   Add-Type -TypeDefinition @'
@@ -238,6 +243,32 @@ public static class DshPopupNative {
 '@
 }
 
+# Sound-only mode: the Host starts this helper with the popup toggle off and
+# the sound toggle on. Play the same normalized chime and exit before any WPF
+# window is constructed.
+if ($SoundOnly) {
+  $chime = Get-NotifierChime
+  try {
+    $played = $false
+    if ($null -ne $chime) {
+      # Synchronous playback: this helper exits as soon as the sound ends. The
+      # popup path can use SND_ASYNC because its window keeps the process alive,
+      # but an async sound here would be cut off by the immediate exit.
+      $played = [DshPopupNative]::PlaySound($chime, [IntPtr]::Zero, 0x20002)
+    }
+    if ($played) {
+      Write-NotifierLog "sound-only played file=$chime"
+    } else {
+      [System.Media.SystemSounds]::Asterisk.Play()
+      Start-Sleep -Milliseconds 1300
+      Write-NotifierLog 'sound-only fallback=SystemSounds'
+    }
+  } catch {
+    Write-NotifierLog "sound-only error=$($_.Exception.Message)"
+  }
+  exit 0
+}
+
 # The popup inherits the Host's ELECTRON_RUN_AS_NODE=1; launching the app
 # executable with it would start a Node runtime (and a console) instead of the
 # desktop GUI. Start a clean second instance instead: it forwards to the
@@ -250,6 +281,10 @@ function Start-DshApplication([string]$Executable) {
   [void]$info.EnvironmentVariables.Remove('ELECTRON_RUN_AS_NODE')
   [void][System.Diagnostics.Process]::Start($info)
 }
+
+Add-Type -AssemblyName PresentationFramework
+Add-Type -AssemblyName PresentationCore
+Add-Type -AssemblyName WindowsBase
 
 $work = [System.Windows.SystemParameters]::WorkArea
 $width = 380.0

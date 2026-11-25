@@ -2,6 +2,7 @@
 
 ## Current
 
+- 0.2.3 makes the two composer toggles independent: popups off with sound on plays the chime alone, and both off stays silent.
 - 0.2.2 replaces the route admission that DSH `0.2.3-alpha.2` removed (`connection.requestRejection`) with the admitted Peer, so the composer toggles, click-to-return and approval reports work again.
 - 0.2.1 fixed the Client-half inject but still used the removed route check; treat it as superseded.
 - Public at `https://github.com/little-bird-vodka/dsh-session-done-notifier`, tag `session-done-notifier@0.2.2` (commit `962bb37`).
@@ -12,6 +13,7 @@
 
 ## Done
 
+- 2026-11-25: 0.2.3 — separate the sound channel from the popup: a `-SoundOnly` helper path plays the chime when the bell is off and the speaker is on; popups, questions and approval reports follow the same rule. Playback is synchronous so the immediate exit cannot truncate the 1.29 s chime.
 - 2026-11-25: 0.2.2 — use the route's admitted Peer instead of the removed `connection.requestRejection`; verified both composer toggles persist and a pending activation file is consumed on DSH `0.2.3-alpha.2`; `main` and the tag pushed.
 - 2026-11-25: 0.2.1 — inject `uiSession.sessionStatus`; narrow `engines.dsh` to `>=0.2.3-alpha.2 <0.3.0`; declare `dsh.bundle.platforms: ["win32"]`; `main` and the tag pushed (superseded by 0.2.2 because the routes still failed).
 - 2026-11-07: admitted to dshopen (issue #290) and dsh.works (PR #223) from commit `76852da`, `verifiedAgainst: 0.2.2-rc.1`.

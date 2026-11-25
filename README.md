@@ -14,9 +14,9 @@ Windows-only. DSH Desktop `0.2.3-alpha.2` is the tested version (`engines.dsh` a
 
 - **Turn outcomes**: `completed`, `error` (with the `LlmFailure` message or code), `aborted`/`interrupted`, `max-tokens`, and `blocked` get different titles and bodies. Errors do not reuse the previous reply preview.
 - **Distinct icons**: every popup kind has its own shape and color, so the type is readable without relying on color alone.
-- **Optional Windows chime**: one normalized copy of the system notification sound, cached under `%TEMP%`; it respects the system volume and can be turned off.
+- **Optional Windows chime**: one normalized copy of the system notification sound, cached under `%TEMP%`; it respects the system volume and can be turned off. With popups off and sound on it plays the chime alone, without a card.
 - **Click to return**: restores a minimized window, raises a covered one, reopens a tray-hidden window through the app's own `show()` path, and switches back to the source session.
-- **Two composer toggles**: popup on/off and sound on/off, persisted per profile.
+- **Two composer toggles**: popup on/off and sound on/off, independent and persisted per profile.
 - **No runtime dependencies**: plain ESM on the Host and a small PowerShell/WPF helper on the desktop.
 
 ## Install
@@ -87,6 +87,17 @@ Two 24 px buttons appear in the composer tool row (`conversation.input.right`):
 - bell: popup on/off;
 - speaker: sound on/off.
 
+The toggles are independent:
+
+| bell | speaker | result |
+| --- | --- | --- |
+| on | on | popup with chime |
+| on | off | popup, silent |
+| off | on | chime only, no card |
+| off | off | nothing |
+
+The sound-only path starts the same helper with `-SoundOnly`, which plays the normalized chime and exits before any WPF window is created.
+
 State is stored in `$DSH_HOME/session-done-notifier.json`:
 
 ```json
@@ -125,7 +136,7 @@ The source session is written to `%TEMP%\dsh-session-done-notifier-activate-<pid
 - **Route admission.** DSH `0.2.2-rc.2` removed `ctx.connection.requestRejection` and made every WebServer route `auth: 'required'` by default. 0.2.2 relies on the admitted Peer passed to the handler; 0.2.1 still called the removed method, so its routes answered 400 and the composer toggles reverted, click-to-return never consumed the activation file, and approval reports were dropped.
 - **Host process crash.** If the DSH Host process itself crashes or is killed, no popup is possible: the plugin and the popup helper live in that process. A failed turn that ends with `turn/end: error` is covered.
 - **Approvals need a connected Client.** They are reported from the Client's pending-interaction state; if no Client is connected, the approval UI is unavailable too.
-- **Cold start.** Each popup starts a PowerShell/WPF process (roughly 0.6–1.2 s). Simultaneous reminders start separate helpers and stack upward.
+- **Cold start.** Each popup starts a PowerShell/WPF process (roughly 0.6–1.2 s). Simultaneous reminders start separate helpers and stack upward. A sound-only reminder also starts a helper (about 0.5 s before the chime); there is no resident process.
 - **Primary monitor.** The card is fixed at the primary work area's bottom-right; it does not follow the monitor under the cursor.
 - **Sound at low volume.** The chime is normalized to about 92% peak, but a low system volume or a muted output device still silences it.
 - Questions are recognized by the tool name `ask_user_question`; a rename in DSH needs `QUESTION_TOOL_NAME` updated.
@@ -172,7 +183,8 @@ Both entries install from the pinned Git commit while no npm release exists. The
 - Both composer toggles were flipped on `0.2.2-rc.1` and the settings file reflected each change (bell/speaker).
 - On `0.2.3-alpha.2` (2026-11-25): 0.2.0's Client half failed to apply with `cannot get property "uiSession.sessionStatus" without inject`, so `conversation.input.right` had no occupant and the activation file written by a popup click was never consumed. 0.2.1 restored the Client half (active slot occupant, both toggles rendered), but its routes still called the removed `connection.requestRejection`, so a toggle click reverted and the activation file stayed unread.
 - On `0.2.3-alpha.2` with 0.2.2: both composer toggles persist their state to `$DSH_HOME/session-done-notifier.json` (clicked, and the file changed), and the Client consumed a pending activation file through the authenticated `/activate` route.
-- Pending checks on 0.2.2: a popup click switching back to another session (the navigation itself), a real approval popup, and a live failed-turn popup.
+- On `0.2.3-alpha.2` with 0.2.3: with the bell off and the speaker on, a session completion and an `ask_user_question` call each played the full chime with no popup; sound-only playback is synchronous, so the helper cannot exit before the 1.29 s chime ends. An async first attempt logged `played` but was cut off by the immediate exit, which is why 0.2.3 waits for playback.
+- Pending checks on 0.2.3: a popup click switching back to another session (the navigation itself), a real approval popup, and a live failed-turn popup.
 - The `error`/`aborted` copy and icons were exercised against real `turn/end` reasons from local session logs, but a live failed-turn popup is still an occasional check rather than a scripted test.
 
 ## License

@@ -241,6 +241,8 @@ export function apply(ctx) {
   /** Stack index for popups that arrive together. */
   let popupSlot = 0
   let lastPopupAt = 0
+  /** Last audible-only reminder, used to fold a burst into one chime. */
+  let lastSoundAt = 0
   let disposed = false
 
   // A plugin reload during a running turn must still notify when that turn
@@ -354,7 +356,7 @@ export function apply(ctx) {
       sendJson(response, 400, { error: 'invalid JSON' })
       return
     }
-    if (body?.kind !== 'approval' || !settings.enabled) {
+    if (body?.kind !== 'approval' || (!settings.enabled && !settings.sound)) {
       sendJson(response, 200, { shown: false })
       return
     }
@@ -368,6 +370,12 @@ export function apply(ctx) {
       : `${String(body.toolName ?? '')}|${String(body.reason ?? '')}`
     if (!firstPending(`approval|${session.id}|${identity}`)) {
       sendJson(response, 200, { shown: false, duplicate: true })
+      return
+    }
+
+    if (!settings.enabled) {
+      playSoundOnly()
+      sendJson(response, 200, { shown: false, sound: true })
       return
     }
 
@@ -486,22 +494,55 @@ export function apply(ctx) {
     }
     if (sound) args.push('-Sound')
 
+    spawnHelper(args, 'popup helper')
+  }
+
+  /**
+   * Start one detached PowerShell helper and track it for plugin unload.
+   * @param {string[]} args - helper arguments.
+   * @param {string} label - diagnostic name for failures.
+   */
+  function spawnHelper(args, label) {
     let helper
     try {
       helper = spawn(powershell, args, { windowsHide: true, stdio: 'ignore' })
     } catch (error) {
-      logger.warn(`could not start the popup helper: ${error instanceof Error ? error.message : String(error)}`)
+      logger.warn(`could not start the ${label}: ${error instanceof Error ? error.message : String(error)}`)
       return
     }
     helpers.add(helper)
     helper.on('error', (error) => {
       helpers.delete(helper)
-      logger.warn(`popup helper failed: ${error instanceof Error ? error.message : String(error)}`)
+      logger.warn(`${label} failed: ${error instanceof Error ? error.message : String(error)}`)
     })
     helper.on('exit', (code) => {
       helpers.delete(helper)
-      if (code !== null && code !== 0) logger.warn(`popup helper exited with code ${code}`)
+      if (code !== null && code !== 0) logger.warn(`${label} exited with code ${code}`)
     })
+  }
+
+  /**
+   * Play the notification chime without a popup. The popup and sound toggles
+   * are independent: with popups off and sound on, a finishing Session still
+   * gets its audible reminder.
+   */
+  function playSoundOnly() {
+    if (!settings.sound) return
+    const now = Date.now()
+    if (now - lastSoundAt < MIN_NOTIFY_INTERVAL_MS) return
+    lastSoundAt = now
+    spawnHelper([
+      '-NoLogo',
+      '-NoProfile',
+      '-NonInteractive',
+      '-ExecutionPolicy',
+      'Bypass',
+      '-WindowStyle',
+      'Hidden',
+      '-File',
+      POPUP_SCRIPT,
+      '-SoundOnly',
+    ], 'sound helper')
   }
 
   /**
@@ -578,13 +619,22 @@ export function apply(ctx) {
    * @param {string} sessionId - Session that just stopped running.
    */
   function notifyCompletion(sessionId) {
-    if (!settings.enabled) return
+    if (!settings.enabled && !settings.sound) return
     const session = rootSession(sessionId)
     if (session === undefined) return
 
     const now = Date.now()
     if (now - (lastNotified.get(sessionId) ?? 0) < MIN_NOTIFY_INTERVAL_MS) return
     lastNotified.set(sessionId, now)
+
+    if (!settings.enabled) {
+      // The popup toggle is off; the sound toggle still owns the reminder.
+      // Drop the recorded copy so a later re-enabled popup cannot show it.
+      outcomes.delete(sessionId)
+      previews.delete(sessionId)
+      playSoundOnly()
+      return
+    }
 
     const recorded = outcomes.get(sessionId)
     outcomes.delete(sessionId)
@@ -603,12 +653,17 @@ export function apply(ctx) {
    * @param {{ data?: { callId?: string, arguments?: string } }} event - `tool/call` event.
    */
   function notifyQuestionCall(session, event) {
-    if (!settings.enabled) return
+    if (!settings.enabled && !settings.sound) return
     const root = rootSession(session?.id)
     if (root === undefined) return
 
     const callId = event?.data?.callId ?? ''
     if (!firstPending(`question|${root.id}|${callId}`)) return
+
+    if (!settings.enabled) {
+      playSoundOnly()
+      return
+    }
 
     let questions = []
     const raw = event?.data?.arguments
