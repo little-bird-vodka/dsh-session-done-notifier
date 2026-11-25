@@ -172,8 +172,8 @@ Install a local checkout with `plugin_manager install_bundle` and restart DSH af
 
 ## Listings
 
-- **Open Plugin Market (dshopen)**: listed from commit `76852da` with 0.2.0 ([issue #290](https://github.com/polang233/dsh-plugin-index/issues/290), closed as completed); the 0.2.3 update is pending.
-- **dsh.works**: listed with 0.2.0 ([PR #223](https://github.com/dshworks/awesome-dsh-plugins/pull/223), following the closed #222); the 0.2.3 update is pending.
+- **Open Plugin Market (dshopen)**: listed from commit `76852da` with 0.2.0; the 0.2.3 update is requested in [issue #290](https://github.com/polang233/dsh-plugin-index/issues/290#issuecomment-7154729400).
+- **dsh.works**: listed with 0.2.0 ([PR #223](https://github.com/dshworks/awesome-dsh-plugins/pull/223), following the closed #222); the 0.2.3 re-verification is [PR #258](https://github.com/dshworks/awesome-dsh-plugins/pull/258).
 
 Both entries install from the pinned Git commit while no npm release exists. The 0.2.0 listing is affected by the Client-half and route bugs fixed in 0.2.2, and lacks the 0.2.3 independent sound toggle.
 
