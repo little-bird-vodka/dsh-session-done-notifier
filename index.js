@@ -278,27 +278,21 @@ export function apply(ctx) {
   }
 
   /**
-   * Apply the Host's browser-trust checks to one plugin route. A composition
-   * without Connection cannot authenticate the caller, so it refuses instead
-   * of falling back to a header or loopback check.
-   * @param {import('node:http').IncomingMessage} request - route request.
+   * Refuse one plugin route the WebServer admitted without an authenticated
+   * Peer. Since DSH `0.2.2-rc.2` every route defaults to `auth: 'required'`
+   * and the admitted Peer arrives as the handler's third argument, so a
+   * missing Peer means the composition changed admission to anonymous;
+   * refusing keeps these routes owner-only instead of falling back to a
+   * header or loopback check.
    * @param {import('node:http').ServerResponse} response - route response.
+   * @param {unknown} peer - Peer the WebServer admitted for this request.
    * @returns {boolean} whether the request was rejected.
    */
-  function rejectUntrusted(request, response) {
-    const connection = ctx.get('connection')
-    if (connection === undefined) {
-      response.writeHead(503, { 'content-type': 'text/plain; charset=utf-8' })
-      response.end('connection service unavailable')
-      return true
-    }
-    const rejection = connection.requestRejection({ headers: request.headers })
-    if (rejection !== undefined) {
-      response.writeHead(rejection)
-      response.end()
-      return true
-    }
-    return false
+  function rejectUntrusted(response, peer) {
+    if (peer !== undefined) return false
+    response.writeHead(401, { 'content-type': 'text/plain; charset=utf-8', 'cache-control': 'no-store' })
+    response.end('authentication required')
+    return true
   }
 
   /**
@@ -306,9 +300,10 @@ export function apply(ctx) {
    * The popup helper writes this file; no unauthenticated route accepts it.
    * @param {import('node:http').IncomingMessage} request - route request.
    * @param {import('node:http').ServerResponse} response - route response.
+   * @param {unknown} [peer] - admitted Peer.
    */
-  async function handleActivateRequest(request, response) {
-    if (rejectUntrusted(request, response)) return
+  async function handleActivateRequest(request, response, peer) {
+    if (rejectUntrusted(response, peer)) return
     if (request.headers[SETTINGS_HEADER] !== '1') {
       sendJson(response, 403, { error: 'forbidden' })
       return
@@ -339,9 +334,10 @@ export function apply(ctx) {
    * listener can observe it.
    * @param {import('node:http').IncomingMessage} request - route request.
    * @param {import('node:http').ServerResponse} response - route response.
+   * @param {unknown} [peer] - admitted Peer.
    */
-  async function handlePendingRequest(request, response) {
-    if (rejectUntrusted(request, response)) return
+  async function handlePendingRequest(request, response, peer) {
+    if (rejectUntrusted(response, peer)) return
     if (request.headers[SETTINGS_HEADER] !== '1') {
       sendJson(response, 403, { error: 'forbidden' })
       return
@@ -390,12 +386,13 @@ export function apply(ctx) {
   /**
    * Serve the Client half's settings reads and writes. The custom header
    * keeps cross-site form posts from flipping a local preference; the route
-   * itself is loopback-only because the Host binds loopback.
+   * itself relies on the WebServer's required authentication.
    * @param {import('node:http').IncomingMessage} request - route request.
    * @param {import('node:http').ServerResponse} response - route response.
+   * @param {unknown} [peer] - admitted Peer.
    */
-  async function handleSettingsRequest(request, response) {
-    if (rejectUntrusted(request, response)) return
+  async function handleSettingsRequest(request, response, peer) {
+    if (rejectUntrusted(response, peer)) return
     if (request.headers[SETTINGS_HEADER] !== '1') {
       sendJson(response, 403, { error: 'forbidden' })
       return

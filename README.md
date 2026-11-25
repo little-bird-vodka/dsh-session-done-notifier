@@ -93,7 +93,7 @@ State is stored in `$DSH_HOME/session-done-notifier.json`:
 { "enabled": true, "sound": true }
 ```
 
-The Client reads and writes it through the same-origin routes `/session-done-notifier/settings`, `/session-done-notifier/activate`, and `/session-done-notifier/pending`. Every route is admitted through `ctx.connection.requestRejection(request)`; a deployment without the Connection service refuses the routes rather than falling back to a header or loopback check. The custom `x-session-done-notifier: 1` header is kept as a second barrier against cross-site form posts.
+The Client reads and writes it through the same-origin routes `/session-done-notifier/settings`, `/session-done-notifier/activate`, and `/session-done-notifier/pending`. Every route keeps the WebServer's default `auth: 'required'` admission and refuses a handler call without an admitted Peer, so a composition that admits anonymous requests cannot reach it. The custom `x-session-done-notifier: 1` header is kept as a second barrier against cross-site form posts.
 
 ## Click behavior
 
@@ -121,7 +121,8 @@ The source session is written to `%TEMP%\dsh-session-done-notifier-activate-<pid
 - **Windows only.** The helper uses WPF, PowerShell, `winmm`, `user32`, and the Electron window class `Chrome_WidgetWin_1`. On other platforms the Host half stays idle.
 - **Desktop shell facts.** Tray restore depends on the shell's single-instance behavior, `ELECTRON_RUN_AS_NODE` in the Host environment, and the window's `rcNormalPosition`. A future desktop shell may change these; `engines.dsh` is a tested range, not a guarantee.
 - **Internal DSH events.** `api-session/status`, `session/event`, `turn/end`, `uiSession.sessionStatus`, and `webServer` routes are used by this plugin; DSH upgrades can change them.
-- **Client service injection.** The approval observer reads `ctx.uiSession.sessionStatus`, a separate Cordis service since DSH `0.2.2-rc.2`. Version 0.2.1 injects `uiSession.sessionStatus`; without that inject the read throws during `apply`, the Client half unloads, and the composer toggles, click-to-return, and approval popups disappear while Host-side notifications keep working. 0.2.0 had this bug on DSH `0.2.3-alpha.2`.
+- **Client service injection.** The approval observer reads `ctx.uiSession.sessionStatus`, a separate Cordis service since DSH `0.2.2-rc.2`. Versions 0.2.1 and later inject `uiSession.sessionStatus`; without that inject the read throws during `apply`, the Client half unloads, and the composer toggles, click-to-return, and approval popups disappear while Host-side notifications keep working. 0.2.0 had this bug on DSH `0.2.3-alpha.2`.
+- **Route admission.** DSH `0.2.2-rc.2` removed `ctx.connection.requestRejection` and made every WebServer route `auth: 'required'` by default. 0.2.2 relies on the admitted Peer passed to the handler; 0.2.1 still called the removed method, so its routes answered 400 and the composer toggles reverted, click-to-return never consumed the activation file, and approval reports were dropped.
 - **Host process crash.** If the DSH Host process itself crashes or is killed, no popup is possible: the plugin and the popup helper live in that process. A failed turn that ends with `turn/end: error` is covered.
 - **Approvals need a connected Client.** They are reported from the Client's pending-interaction state; if no Client is connected, the approval UI is unavailable too.
 - **Cold start.** Each popup starts a PowerShell/WPF process (roughly 0.6–1.2 s). Simultaneous reminders start separate helpers and stack upward.
@@ -169,8 +170,9 @@ Both entries install from the pinned Git commit while no npm release exists. The
 - Turn completion, question, approval, session-targeted click, tray/minimized/covered/visible click restore, and both toggles were verified on DSH `0.2.1-rc.2`.
 - On `0.2.2-rc.1`: install applied with no warnings, the Client slot stayed active, an unauthenticated `GET /settings` returned 401, authenticated Client `GET`/`POST` requests succeeded (`cookie=yes`), a question popup appeared, and a completion popup clicked from another session returned to the source session through the `%TEMP%` activation file and the authenticated `/activate` route.
 - Both composer toggles were flipped on `0.2.2-rc.1` and the settings file reflected each change (bell/speaker).
-- On `0.2.3-alpha.2` (2026-11-25): 0.2.0's Client half failed to apply with `cannot get property "uiSession.sessionStatus" without inject`, so `conversation.input.right` had no occupant and the activation file written by a popup click was never consumed. 0.2.1 carries the extra inject: the Client entry is active again, its slot occupant registers, the locale dictionary loads, and both composer toggles render.
-- Pending checks on 0.2.1 / `0.2.3-alpha.2`: a popup click returning to its source session, a real approval popup, and a live failed-turn popup.
+- On `0.2.3-alpha.2` (2026-11-25): 0.2.0's Client half failed to apply with `cannot get property "uiSession.sessionStatus" without inject`, so `conversation.input.right` had no occupant and the activation file written by a popup click was never consumed. 0.2.1 restored the Client half (active slot occupant, both toggles rendered), but its routes still called the removed `connection.requestRejection`, so a toggle click reverted and the activation file stayed unread.
+- On `0.2.3-alpha.2` with 0.2.2: both composer toggles persist their state to `$DSH_HOME/session-done-notifier.json` (clicked, and the file changed), and the Client consumed a pending activation file through the authenticated `/activate` route.
+- Pending checks on 0.2.2: a popup click switching back to another session (the navigation itself), a real approval popup, and a live failed-turn popup.
 - The `error`/`aborted` copy and icons were exercised against real `turn/end` reasons from local session logs, but a live failed-turn popup is still an occasional check rather than a scripted test.
 
 ## License
