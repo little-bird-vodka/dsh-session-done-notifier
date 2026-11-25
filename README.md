@@ -8,7 +8,7 @@ A DSH desktop plugin that shows a bottom-right popup when a session needs you:
 
 It works while the DSH window is minimized, covered, or hidden in the tray. A click restores the window, brings it to the front, and reopens the session that sent the reminder.
 
-Windows-only. DSH Desktop `0.2.2-rc.1` is the tested version (`engines.dsh` allows `>=0.2.2-rc.1 <0.3.0`).
+Windows-only. DSH Desktop `0.2.3-alpha.2` is the tested version (`engines.dsh` allows `>=0.2.3-alpha.2 <0.3.0`).
 
 ## Features
 
@@ -46,7 +46,7 @@ plugin_manager(action="install_bundle",
                target="<absolute path to this package>")
 ```
 
-After installation, open **Settings → Plugins** and confirm the bundle is enabled and shows its own icon. On a running profile the Host half may need a DSH restart before its timers/listeners are live; a new install can apply through HMR.
+After installation, open the **Plugins** page and confirm the bundle is enabled and shows its own icon. On a running profile the Host half may need a DSH restart before its timers/listeners are live; a new install can apply through HMR.
 
 ## What triggers a popup
 
@@ -121,6 +121,7 @@ The source session is written to `%TEMP%\dsh-session-done-notifier-activate-<pid
 - **Windows only.** The helper uses WPF, PowerShell, `winmm`, `user32`, and the Electron window class `Chrome_WidgetWin_1`. On other platforms the Host half stays idle.
 - **Desktop shell facts.** Tray restore depends on the shell's single-instance behavior, `ELECTRON_RUN_AS_NODE` in the Host environment, and the window's `rcNormalPosition`. A future desktop shell may change these; `engines.dsh` is a tested range, not a guarantee.
 - **Internal DSH events.** `api-session/status`, `session/event`, `turn/end`, `uiSession.sessionStatus`, and `webServer` routes are used by this plugin; DSH upgrades can change them.
+- **Client service injection.** The approval observer reads `ctx.uiSession.sessionStatus`, a separate Cordis service since DSH `0.2.2-rc.2`. Version 0.2.1 injects `uiSession.sessionStatus`; without that inject the read throws during `apply`, the Client half unloads, and the composer toggles, click-to-return, and approval popups disappear while Host-side notifications keep working. 0.2.0 had this bug on DSH `0.2.3-alpha.2`.
 - **Host process crash.** If the DSH Host process itself crashes or is killed, no popup is possible: the plugin and the popup helper live in that process. A failed turn that ends with `turn/end: error` is covered.
 - **Approvals need a connected Client.** They are reported from the Client's pending-interaction state; if no Client is connected, the approval UI is unavailable too.
 - **Cold start.** Each popup starts a PowerShell/WPF process (roughly 0.6–1.2 s). Simultaneous reminders start separate helpers and stack upward.
@@ -168,7 +169,8 @@ Both entries install from the pinned Git commit while no npm release exists.
 - Turn completion, question, approval, session-targeted click, tray/minimized/covered/visible click restore, and both toggles were verified on DSH `0.2.1-rc.2`.
 - On `0.2.2-rc.1`: install applied with no warnings, the Client slot stayed active, an unauthenticated `GET /settings` returned 401, authenticated Client `GET`/`POST` requests succeeded (`cookie=yes`), a question popup appeared, and a completion popup clicked from another session returned to the source session through the `%TEMP%` activation file and the authenticated `/activate` route.
 - Both composer toggles were flipped on `0.2.2-rc.1` and the settings file reflected each change (bell/speaker).
-- Pending checks: a real approval popup on `0.2.2-rc.1` (the approval path was verified on `0.2.1-rc.2`), and a live failed-turn popup.
+- On `0.2.3-alpha.2` (2026-11-25): 0.2.0's Client half failed to apply with `cannot get property "uiSession.sessionStatus" without inject`, so `conversation.input.right` had no occupant and the activation file written by a popup click was never consumed. 0.2.1 carries the extra inject: the Client entry is active again, its slot occupant registers, the locale dictionary loads, and both composer toggles render.
+- Pending checks on 0.2.1 / `0.2.3-alpha.2`: a popup click returning to its source session, a real approval popup, and a live failed-turn popup.
 - The `error`/`aborted` copy and icons were exercised against real `turn/end` reasons from local session logs, but a live failed-turn popup is still an occasional check rather than a scripted test.
 
 ## License

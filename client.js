@@ -252,7 +252,10 @@ window.__ModuleLoader__.load({
     }
 
     return {
-      inject: ['slots', 'locale', 'uiSession'],
+      // `uiSession.sessionStatus` is its own Cordis service since DSH 0.2.2-rc.2;
+      // reading it without this inject throws during apply and tears the whole
+      // Client half down (including the composer toggles registered above).
+      inject: ['slots', 'locale', 'uiSession', 'uiSession.sessionStatus'],
       apply(ctx) {
         ctx.effect(() => ctx.locale.register(NS, DICT), 'session-done-notifier: dictionaries');
         const t = ctx.locale.bind(NS);

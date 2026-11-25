@@ -1,6 +1,6 @@
 {
   "name": "dsh-session-done-notifier",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "Bottom-right desktop popups with an optional Windows chime when a DSH session finishes, asks a question, or waits for approval, including while the window is minimized or in the tray.",
   "license": "MIT",
   "author": "little-bird-vodka",
@@ -20,7 +20,7 @@
     "windows"
   ],
   "engines": {
-    "dsh": ">=0.2.2-rc.1 <0.3.0"
+    "dsh": ">=0.2.3-alpha.2 <0.3.0"
   },
   "publishConfig": {
     "access": "public"
@@ -43,7 +43,10 @@
     "LICENSE"
   ],
   "dsh": {
-    "bundle": { "patch": "./cordis.patch.yml" },
+    "bundle": {
+      "patch": "./cordis.patch.yml",
+      "platforms": ["win32"]
+    },
     "client": {
       "platform": "web",
       "immediately": true,
