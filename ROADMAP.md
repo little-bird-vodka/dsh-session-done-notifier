@@ -3,7 +3,7 @@
 ## Current
 
 - 0.2.1 fixes the DSH `0.2.3-alpha.2` Client-half failure (missing `uiSession.sessionStatus` inject) and requires `>=0.2.3-alpha.2 <0.3.0`.
-- Public at `https://github.com/little-bird-vodka/dsh-session-done-notifier`, tag `session-done-notifier@0.2.1`.
+- Public at `https://github.com/little-bird-vodka/dsh-session-done-notifier`, tag `session-done-notifier@0.2.1` (commit `5f50a56`).
 - Install is Git-only for now: `dsh plugin --profile desktop add github:little-bird-vodka/dsh-session-done-notifier`.
 - Both community indexes still hold 0.2.0 at commit `76852da`, verified against `0.2.2-rc.1`; both need an update request for 0.2.1:
   - Open Plugin Market: https://github.com/polang233/dsh-plugin-index/issues/290 (closed as completed on 2026-11-07)
@@ -11,7 +11,7 @@
 
 ## Done
 
-- 2026-11-25: 0.2.1 — inject `uiSession.sessionStatus`; narrow `engines.dsh` to `>=0.2.3-alpha.2 <0.3.0`; declare `dsh.bundle.platforms: ["win32"]`; verified the Client apply and slot registration against the running `0.2.3-alpha.2` runtime.
+- 2026-11-25: 0.2.1 — inject `uiSession.sessionStatus`; narrow `engines.dsh` to `>=0.2.3-alpha.2 <0.3.0`; declare `dsh.bundle.platforms: ["win32"]`; verified the Client apply and slot registration against the running `0.2.3-alpha.2` runtime; `main` and the tag pushed.
 - 2026-11-07: admitted to dshopen (issue #290) and dsh.works (PR #223) from commit `76852da`, `verifiedAgainst: 0.2.2-rc.1`.
 - 2026-11-06: split from the `dsh-plugins` monorepo; package metadata, MIT license, publishing notes.
 - 2026-11-06: authenticated `webServer` routes (`connection.requestRejection`); popup activation moved from an unauthenticated POST to a per-process `%TEMP%` file plus an authenticated GET.

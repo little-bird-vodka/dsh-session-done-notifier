@@ -7,8 +7,8 @@ installable source. Both community indexes accept that form.
 ## Git-only listing (no npm account)
 
 - Repository: `https://github.com/little-bird-vodka/dsh-session-done-notifier`
-- Version: `0.2.0`
-- Commit: `76852daa700cee547e0b4e6e34b9d3747751e107`
+- Version: `0.2.1`
+- Commit: `5f50a566c71c4f37e709d0cff7e67c226d341305` (tag `session-done-notifier@0.2.1`)
 - Package root: repository root (no `path:`)
 - Install: `dsh plugin --profile desktop add github:little-bird-vodka/dsh-session-done-notifier`
 
@@ -19,8 +19,8 @@ maintainer checks the new commit, so reply in the issue for later releases.
 
 **dsh.works**: add one entry to `data/plugins.json` in
 [dshworks/awesome-dsh-plugins](https://github.com/dshworks/awesome-dsh-plugins)
-with `repo`, no `npm`, `verifiedAgainst: "0.2.2-rc.1"`, `lastVerified:
-"2026-11-06"`, and an honest `status`. The site generates
+with `repo`, no `npm`, `verifiedAgainst: "0.2.3-alpha.2"`, `lastVerified:
+"2026-11-25"`, and an honest `status`. The site generates
 `dsh plugin --profile web add github:<repo>` for a Git-only entry.
 
 ## Prerequisites for npm
@@ -28,7 +28,7 @@ with `repo`, no `npm`, `verifiedAgainst: "0.2.2-rc.1"`, `lastVerified:
 - A public GitHub repository for this package (suggested: `little-bird-vodka/dsh-session-done-notifier`).
 - An npm account with 2FA; `npm login` on the machine that publishes.
 - The package name `dsh-session-done-notifier` (checked available on 2026-11-06). If it is taken by publish time, choose another unscoped name or an owned scope and update `package.json`, `cordis.patch.yml`, and the `window.__ModuleLoader__` id in `client.js`.
-- `engines.dsh` already declares the tested range (`>=0.2.2-rc.1 <0.3.0`). Bump it when a newer DSH is verified.
+- `engines.dsh` already declares the tested range (`>=0.2.3-alpha.2 <0.3.0`). Bump it when a newer DSH is verified.
 
 ## 1. Publish to npm
 
@@ -45,7 +45,7 @@ The published tarball must include `index.js`, `client.js`, `lib/popup.ps1`, `co
 Use a **separate profile**, not the profile you develop in:
 
 ```sh
-dsh plugin --profile sdn-test add dsh-session-done-notifier@0.2.0
+dsh plugin --profile sdn-test add dsh-session-done-notifier@0.2.1
 dsh --profile sdn-test --dump-config
 ```
 
@@ -100,10 +100,10 @@ Minimal entry:
     "icon": "icons/session-done-notifier.svg",
     "repository": { "url": "https://github.com/little-bird-vodka/dsh-session-done-notifier" },
     "versions": [{
-      "version": "0.2.0",
-      "publishTimestamp": 1793980800,
+      "version": "0.2.1",
+      "publishTimestamp": 1795593600,
       "source": { "type": "npm" },
-      "engines": { "dsh": ">=0.2.2-rc.1 <0.3.0" }
+      "engines": { "dsh": ">=0.2.3-alpha.2 <0.3.0" }
     }]
   }]
 }
@@ -114,7 +114,7 @@ Minimal entry:
 ## Release checklist
 
 - [ ] `npm pack --dry-run` contains every runtime file and no local artifacts.
-- [ ] `engines.dsh` matches the version tested.
+- [ ] `engines.dsh` matches the version tested, and `dsh.bundle.platforms` lists every supported Host platform (`["win32"]`).
 - [ ] Public repo has `LICENSE`, `README.md`, and the `repository` field.
 - [ ] Clean-profile install and the four path checks above pass.
 - [ ] `git tag <name>@<version>` and push the tag with `main`.
